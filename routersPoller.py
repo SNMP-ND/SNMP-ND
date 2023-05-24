@@ -50,9 +50,7 @@ for router in routers_to_poll:
             routers_to_poll.append(ospf_neighbor)
 
 
-    
-    max_interfaces = 3  
-    interfaces_retrieved = 0
+    interfaces_retrieved = []
 
     for (errorIndication,
          errorStatus,
@@ -64,7 +62,9 @@ for router in routers_to_poll:
                         ObjectType(ObjectIdentity('IF-MIB', 'ifIndex')),
                         ObjectType(ObjectIdentity('IF-MIB', 'ifDescr')),
                         ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
-                        ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed'))): # OID for interfaces table
+                        ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed')),
+                        ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntIfIndex')),
+                        ):
         
         if errorIndication or errorStatus:
             print('SNMP request error:', errorIndication or errorStatus)
@@ -74,8 +74,6 @@ for router in routers_to_poll:
         for varBind in varBinds:
             print(' = '.join([x.prettyPrint() for x in varBind]))
 
-        interfaces_retrieved += 1
-        if interfaces_retrieved >= max_interfaces:
-            break  
+        
     
     
