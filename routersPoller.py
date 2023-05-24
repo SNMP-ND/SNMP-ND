@@ -109,6 +109,13 @@ def main():
         # Next, get the interfaces
         interfaces = getInterfaces(ip)
         router.setInterfaces(interfaces)
+
+        # Prints for debugging
+        print("Router: " + router.getSysName())
+        print("Neighbors: " + str(router.getNeighbors()))
+        print("Interfaces:")
+        for interface in router.getInterfaces():
+            print(interface)
         
         max_tables = 8
         done = 0
