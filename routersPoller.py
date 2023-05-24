@@ -1,9 +1,11 @@
 from pysnmp.hlapi import *
+from tabulate import tabulate
 
 start_router = '11.0.0.2'
 community = 'public'
 
 routers_to_poll = [start_router]
+routing_table = []
 
 for router in routers_to_poll:
     # First, get the system name
@@ -78,23 +80,42 @@ for router in routers_to_poll:
 
         if max_int >= max_neighbors:
             break
+    
+    max_tables = 8
+    done = 0
 
-    for (errorIndication,
-         errorStatus,
-         errorIndex,
-         varBinds) in nextCmd(SnmpEngine(),
-                        CommunityData(community),
-                        UdpTransportTarget((router, 161)),
-                        ContextData(),
-                        ObjectType(ObjectIdentity('1.3.6.1.2.1.4.21'))
-                        ):
-        
+    routing_table_oid = '1.3.6.1.2.1.4.21'  # OID for the routing table
+    destination_oid = '1.3.6.1.2.1.4.21.1.1'  # OID for destination
+    route_type_oid = '1.3.6.1.2.1.4.21.1.8'  # OID for route type
+    next_hop_oid = '1.3.6.1.2.1.4.21.1.7'  # OID for next hop
+    interface_oid = '1.3.6.1.2.1.4.21.1.2'  # OID for interface
+
+    for (errorIndication, errorStatus, errorIndex, varBinds) in nextCmd(
+            SnmpEngine(),
+            CommunityData(community),
+            UdpTransportTarget((router, 161)),
+            ContextData(),
+            ObjectType(ObjectIdentity(destination_oid)),
+            ObjectType(ObjectIdentity(route_type_oid)),
+            ObjectType(ObjectIdentity(next_hop_oid)),
+            ObjectType(ObjectIdentity(interface_oid))):
+
         if errorIndication or errorStatus:
             print('SNMP request error:', errorIndication or errorStatus)
             break
-
         for varBind in varBinds:
-            print(' = '.join([x.prettyPrint() for x in varBind]))
+            routing_table_entry = [x.prettyPrint() for x in varBind]
+            routing_table.append(routing_table_entry)
+
+        done+=1
+        if done >= max_tables:
+            break
+
+    headers = ["Destination", "Route Type", "Next Hop", "Interface"]
+
+    # Print the routing table using the tabulate library
+    print(tabulate(routing_table, headers=headers, tablefmt="grid"))
+
 
         
     
