@@ -5,9 +5,7 @@ community = 'public'
 
 routers_to_poll = [start_router]
 
-
 for router in routers_to_poll:
-
     # First, get the system name
     errorIndication, errorStatus, errorIndex, varBinds = next(
         getCmd(SnmpEngine(),
@@ -26,6 +24,7 @@ for router in routers_to_poll:
 
     max_neighbors = 3
     neighbors_retrieved = 0
+
     # Next, get the OSPF neighbors
     for (errorIndication,
          errorStatus,
@@ -44,21 +43,6 @@ for router in routers_to_poll:
         ospf_neighbor = str(ospf_neighbor[ospf_neighbor.find("=")+2:])
         print(f'Ospf Neighbor for {router}: {ospf_neighbor}')
 
-        errorIndication, errorStatus, errorIndex, varBinds = next(
-            getCmd(SnmpEngine(),
-                   CommunityData(community),
-                   UdpTransportTarget((ospf_neighbor, 161)),
-                   ContextData(),
-                   ObjectType(ObjectIdentity('1.3.6.1.2.1.1.5.0')))
-        )
-
-        if errorIndication or errorStatus:
-            print('SNMP request error:', errorIndication or errorStatus)
-            continue
-
-        neighbor_sysName = varBinds[0][1]
-        print(f'System Name of neighbor {ospf_neighbor}: {neighbor_sysName}')
-
 
         if ospf_neighbor not in routers_to_poll:
             routers_to_poll.append(ospf_neighbor)
@@ -69,7 +53,6 @@ for router in routers_to_poll:
     
     max_interfaces = 3  
     interfaces_retrieved = 0
-
     
     for (errorIndication,
          errorStatus,
