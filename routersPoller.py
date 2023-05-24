@@ -120,36 +120,45 @@ def main():
         max_tables = 8
         done = 0
 
-        routing_table_oid = '1.3.6.1.2.1.4.21'  # OID for the routing table
         destination_oid = '1.3.6.1.2.1.4.21.1.1'  # OID for destination
         route_type_oid = '1.3.6.1.2.1.4.21.1.8'  # OID for route type
         next_hop_oid = '1.3.6.1.2.1.4.21.1.7'  # OID for next hop
         interface_oid = '1.3.6.1.2.1.4.21.1.2'  # OID for interface
+        routing_table_oid = '1.3.6.1.2.1.4.21'
 
-        for (errorIndication, errorStatus, errorIndex, varBinds) in nextCmd(
-                snmpEngine,
+        routingTable = []  # List to store routing table entries
+
+        # SNMP walk operation
+        for (errorIndication, errorStatus, errorIndex, varBinds) in bulkCmd(
+                SnmpEngine(),
                 CommunityData(community),
                 UdpTransportTarget((ip, 161)),
                 ContextData(),
-                ObjectType(ObjectIdentity(destination_oid)),
-                ObjectType(ObjectIdentity(route_type_oid)),
-                ObjectType(ObjectIdentity(next_hop_oid)),
-                ObjectType(ObjectIdentity(interface_oid))):
-
-            if errorIndication or errorStatus:
-                print('SNMP request error:', errorIndication or errorStatus)
+                0,  # Non-repeaters
+                25,  # Max-repetitions
+                ObjectType(ObjectIdentity(routing_table_oid))
+        ):
+            if errorIndication:
+                print(f'SNMP Error: {errorIndication}')
                 break
-            for varBind in varBinds:
-                routing_table_entry = [x.prettyPrint() for x in varBind]
-                routingTable.append(routing_table_entry)
-
-            done+=1
-            if done >= max_tables:
+            elif errorStatus:
+                print(f'SNMP Error: {errorStatus.prettyPrint()}')
                 break
+            else:
+                # Process the varBinds for routing table information
+                for varBind in varBinds:
+                    oid = varBind[0]
+                    value = varBind[1]
+                    if str(oid).startswith(routing_table_oid):
+                        dest = oid.prettyPrint()
+                        route_type = value.prettyPrint()
+                        next_hop = value.getNext().prettyPrint() if value.getNext() else ""
 
-        headers = ["Destination", "Route Type", "Next Hop", "Interface"]
+                        # Add routing table entry to the list
+                        routingTable.append([dest, route_type, next_hop])
 
         # Print the routing table using the tabulate library
+        headers = ["Destination", "Route Type", "Next Hop"]
         print(tabulate(routingTable, headers=headers, tablefmt="grid"))
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
