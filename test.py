@@ -1,16 +1,3 @@
-import netsnmp
-from pysnmp import *
-"""
-def snmpwalk(host, community, oid):
-    var = netsnmp.VarList(netsnmp.Varbind(oid))
-    res = netsnmp.snmpwalk(var, Version=2, DestHost=host, Community=community)
-
-    for val in res:
-        print(f"{oid}: {val}")
-
-# Example usage:
-snmpwalk('11.0.0.2', 'public', '.1.3.6.1.2.1.1.0')
-"""
 from pysnmp.hlapi import *
 
 def snmpwalk(host, community, oid):

@@ -56,6 +56,7 @@ for router in routers_to_poll:
          errorStatus,
          errorIndex,
          varBinds) in nextCmd(SnmpEngine(),
+<<<<<<< Updated upstream
                         CommunityData(community),
                         UdpTransportTarget((router, 161)),
                         ContextData(),
@@ -65,6 +66,15 @@ for router in routers_to_poll:
                         ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed')),
                         ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntIfIndex')),
                         ):
+=======
+                    CommunityData(community),
+                    UdpTransportTarget((router, 161)),
+                    ContextData(),
+                    ObjectType(ObjectIdentity('IF-MIB', 'ifIndex')),
+                    ObjectType(ObjectIdentity('IF-MIB', 'ifDescr')),
+                    ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
+                    ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed'))): # OID for interfaces table
+>>>>>>> Stashed changes
         
         if errorIndication or errorStatus:
             print('SNMP request error:', errorIndication or errorStatus)
