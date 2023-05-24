@@ -43,33 +43,39 @@ for router in routers_to_poll:
         ospf_neighbor = str(ospf_neighbor[ospf_neighbor.find("=")+2:])
         print(f'Ospf Neighbor for {router}: {ospf_neighbor}')
 
+        if ospf_neighbor in routers_to_poll:
+            break
 
         if ospf_neighbor not in routers_to_poll:
             routers_to_poll.append(ospf_neighbor)
 
-        neighbors_retrieved += 1
-        if neighbors_retrieved >= max_neighbors:
-            break  
+
     
     max_interfaces = 3  
     interfaces_retrieved = 0
-    
+
     for (errorIndication,
          errorStatus,
          errorIndex,
          varBinds) in nextCmd(SnmpEngine(),
-                               CommunityData(community),
-                               UdpTransportTarget((router, 161)),
-                               ContextData(),
-                               ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1'))): # OID for interfaces table
+                        CommunityData(community),
+                        UdpTransportTarget((router, 161)),
+                        ContextData(),
+                        ObjectType(ObjectIdentity('IF-MIB', 'ifIndex')),
+                        ObjectType(ObjectIdentity('IF-MIB', 'ifDescr')),
+                        ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
+                        ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed'))): # OID for interfaces table
+        
         if errorIndication or errorStatus:
             print('SNMP request error:', errorIndication or errorStatus)
             break
 
+        
         for varBind in varBinds:
             print(' = '.join([x.prettyPrint() for x in varBind]))
 
         interfaces_retrieved += 1
         if interfaces_retrieved >= max_interfaces:
             break  
+    
     
