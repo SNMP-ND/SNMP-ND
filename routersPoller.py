@@ -50,13 +50,13 @@ for router in routers_to_poll:
             routers_to_poll.append(ospf_neighbor)
 
 
-    interfaces_retrieved = []
+    interfaces_retrieved = 0
+    max_int = 3
 
     for (errorIndication,
          errorStatus,
          errorIndex,
          varBinds) in nextCmd(SnmpEngine(),
-<<<<<<< Updated upstream
                         CommunityData(community),
                         UdpTransportTarget((router, 161)),
                         ContextData(),
@@ -66,23 +66,18 @@ for router in routers_to_poll:
                         ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed')),
                         ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntIfIndex')),
                         ):
-=======
-                    CommunityData(community),
-                    UdpTransportTarget((router, 161)),
-                    ContextData(),
-                    ObjectType(ObjectIdentity('IF-MIB', 'ifIndex')),
-                    ObjectType(ObjectIdentity('IF-MIB', 'ifDescr')),
-                    ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
-                    ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed'))): # OID for interfaces table
->>>>>>> Stashed changes
         
         if errorIndication or errorStatus:
             print('SNMP request error:', errorIndication or errorStatus)
             break
 
-        
         for varBind in varBinds:
             print(' = '.join([x.prettyPrint() for x in varBind]))
+
+        interfaces_retrieved+=1
+
+        if max_int >= max_neighbors:
+            break
 
         
     
