@@ -79,6 +79,23 @@ for router in routers_to_poll:
         if max_int >= max_neighbors:
             break
 
+    for (errorIndication,
+         errorStatus,
+         errorIndex,
+         varBinds) in nextCmd(SnmpEngine(),
+                        CommunityData(community),
+                        UdpTransportTarget((router, 161)),
+                        ContextData(),
+                        ObjectType(ObjectIdentity('1.3.6.1.2.1.4.21'))
+                        ):
+        
+        if errorIndication or errorStatus:
+            print('SNMP request error:', errorIndication or errorStatus)
+            break
+
+        for varBind in varBinds:
+            print(' = '.join([x.prettyPrint() for x in varBind]))
+
         
     
     
