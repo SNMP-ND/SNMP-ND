@@ -126,17 +126,23 @@ def main():
         interface_oid = '1.3.6.1.2.1.4.21.1.2'  # OID for interface
         routing_table_oid = '1.3.6.1.2.1.4.21'
 
+        ROUTE_NETWORK_OID = "IP-FORWARD-MIB::ipCidrRouteDest"
+        ROUTE_MASK_OID = "IP-FORWARD-MIB::ipCidrRouteMask"
+        ROUTE_NEXT_HOP_OID = "IP-FORWARD-MIB::ipCidrRouteNextHop"
+        ROUTE_TYPE_OID = "IP-FORWARD-MIB::ipCidrRouteType"
+
+
         routingTable = []  # List to store routing table entries
 
         # SNMP walk operation
-        for (errorIndication, errorStatus, errorIndex, varBinds) in bulkCmd(
+        for (errorIndication, errorStatus, errorIndex, varBinds) in nextCmd(
                 SnmpEngine(),
                 CommunityData(community),
                 UdpTransportTarget((ip, 161)),
                 ContextData(),
-                0,  # Non-repeaters
-                25,  # Max-repetitions
-                ObjectType(ObjectIdentity(routing_table_oid))
+                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteDest')),
+                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteNextHop')),
+                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteType'))
         ):
             if errorIndication:
                 print(f'SNMP Error: {errorIndication}')
@@ -147,19 +153,10 @@ def main():
             else:
                 # Process the varBinds for routing table information
                 for varBind in varBinds:
-                    oid = varBind[0]
-                    value = varBind[1]
-                    if str(oid).startswith(routing_table_oid):
-                        dest = oid.prettyPrint()
-                        route_type = value.prettyPrint()
-                        next_hop = value.getNext().prettyPrint() if value.getNext() else ""
-
-                        # Add routing table entry to the list
-                        routingTable.append([dest, route_type, next_hop])
-
+                    print(varBind)
+                    # Data treat
         # Print the routing table using the tabulate library
-        headers = ["Destination", "Route Type", "Next Hop"]
-        print(tabulate(routingTable, headers=headers, tablefmt="grid"))
+
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
 if __name__ == "__main__":
