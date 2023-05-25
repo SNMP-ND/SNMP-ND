@@ -2,6 +2,8 @@ from pysnmp.hlapi import *
 from tabulate import tabulate
 from interface import Interface
 from router import Router
+from easysnmp import Session
+from routing_tables_poller import RoutingTablesPoller
 
 snmpEngine = SnmpEngine()
 routers = []
@@ -117,46 +119,20 @@ def main():
         for interface in router.getInterfaces():
             print(interface)
         
-        max_tables = 8
-        done = 0
 
-        destination_oid = '1.3.6.1.2.1.4.21.1.1'  # OID for destination
-        route_type_oid = '1.3.6.1.2.1.4.21.1.8'  # OID for route type
-        next_hop_oid = '1.3.6.1.2.1.4.21.1.7'  # OID for next hop
-        interface_oid = '1.3.6.1.2.1.4.21.1.2'  # OID for interface
-        routing_table_oid = '1.3.6.1.2.1.4.21'
+        # Create an SNMP session
+        session = Session(hostname=ip, community=community, version=2)
+        RTP = RoutingTablesPoller(ip, community, session)
+        # Get the routing tables info
+        networks, masks, next_hop, type_link = RTP.getRoutingTablesInfo()
 
-        ROUTE_NETWORK_OID = "IP-FORWARD-MIB::ipCidrRouteDest"
-        ROUTE_MASK_OID = "IP-FORWARD-MIB::ipCidrRouteMask"
-        ROUTE_NEXT_HOP_OID = "IP-FORWARD-MIB::ipCidrRouteNextHop"
-        ROUTE_TYPE_OID = "IP-FORWARD-MIB::ipCidrRouteType"
+        print("Networks: " + str(networks))
+        print("Masks: " + str(masks))
+        print("Next hop: " + str(next_hop))
+        print("Type link: " + str(type_link))
 
-
-        routingTable = []  # List to store routing table entries
-
-        # SNMP walk operation
-        for (errorIndication, errorStatus, errorIndex, varBinds) in nextCmd(
-                SnmpEngine(),
-                CommunityData(community),
-                UdpTransportTarget((ip, 161)),
-                ContextData(),
-                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteDest')),
-                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteNextHop')),
-                ObjectType(ObjectIdentity('IP-FORWARD-MIB', 'ipCidrRouteType'))
-        ):
-            if errorIndication:
-                print(f'SNMP Error: {errorIndication}')
-                break
-            elif errorStatus:
-                print(f'SNMP Error: {errorStatus.prettyPrint()}')
-                break
-            else:
-                # Process the varBinds for routing table information
-                for varBind in varBinds:
-                    print(varBind)
-                    # Data treat
-        # Print the routing table using the tabulate library
-
+        
+        
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
 if __name__ == "__main__":
