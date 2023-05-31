@@ -29,7 +29,6 @@ class RouteSummaries:
 
                 print(f"IPorig: {src_hop} -> {' -> '.join(shortest_path)} -> IPdest: {dst_hop}")
             except nx.NetworkXNoPath:
-                # If no path exists between the source and destination networks
-                print(f"No path found between {src_net} and {dst_net}")
+                pass
 
 

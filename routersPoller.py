@@ -101,6 +101,7 @@ def main():
     networks = []
     next_hop = []
     for ip in IPsToPoll:
+        print("Polling " + ip)
         # First, get the system name
 
         sysName = getSysName(ip)
@@ -128,7 +129,7 @@ def main():
         networks2, masks, next_hop2, type_link = RTP.getRoutingTablesInfo()
         networks.extend(networks2)
         next_hop.extend(next_hop2)
-        
+
         RS = RouteSummaries()
         RS.createSummaries(networks, next_hop)
 

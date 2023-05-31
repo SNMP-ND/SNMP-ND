@@ -12,6 +12,7 @@ tabulate = "*"
 easysnmp = "*"
 netaddr = "*"
 networkx = "*"
+graphviz = "*"
 
 [dev-packages]
 
