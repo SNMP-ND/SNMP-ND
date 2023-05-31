@@ -4,6 +4,7 @@ from interface import Interface
 from router import Router
 from easysnmp import Session
 from routing_tables_poller import RoutingTablesPoller
+from routeSummaries import RouteSummaries
 
 snmpEngine = SnmpEngine()
 routers = []
@@ -97,8 +98,9 @@ def getInterfaces(ip : str):
 
 
 def main():
+    networks = []
+    next_hop = []
     for ip in IPsToPoll:
-
         # First, get the system name
 
         sysName = getSysName(ip)
@@ -119,15 +121,16 @@ def main():
         for interface in router.getInterfaces():
             print(interface)
         
-
         # Create an SNMP session
         session = Session(hostname=ip, community=community, version=2)
         RTP = RoutingTablesPoller(ip, community, session)
         # Get the routing tables info
-        networks, masks, next_hop, type_link = RTP.getRoutingTablesInfo()
-
-
+        networks2, masks, next_hop2, type_link = RTP.getRoutingTablesInfo()
+        networks.extend(networks2)
+        next_hop.extend(next_hop2)
         
+        RS = RouteSummaries()
+        RS.createSummaries(networks, next_hop)
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
 if __name__ == "__main__":
