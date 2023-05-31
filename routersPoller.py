@@ -126,12 +126,7 @@ def main():
         # Get the routing tables info
         networks, masks, next_hop, type_link = RTP.getRoutingTablesInfo()
 
-        print("Networks: " + str(networks))
-        print("Masks: " + str(masks))
-        print("Next hop: " + str(next_hop))
-        print("Type link: " + str(type_link))
 
-        
         
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
