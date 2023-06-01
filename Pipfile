@@ -13,6 +13,7 @@ easysnmp = "*"
 netaddr = "*"
 networkx = "*"
 graphviz = "*"
+matplotlib = "*"
 
 [dev-packages]
 
