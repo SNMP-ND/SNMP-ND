@@ -29,7 +29,7 @@ def getSysName(ip : str):
     if errorIndication or errorStatus:
         print('SNMP request error:', errorIndication or errorStatus)
 
-    return varBinds[0][1]
+    return str(varBinds[0][1])
 
 def getOSPFNeighbors(ip : str):
     neighbors = []
@@ -80,11 +80,11 @@ def getInterfaces(ip : str):
                 break
 
             # Extract the interface information from the varBinds
-            ifIndex = varBinds[0][1]
-            idDescr = varBinds[1][1]
-            ifOperStatus = varBinds[2][1]
-            ifSpeed = varBinds[3][1]
-            ipAdEntAddr = str(varBinds[4]).split("= ")[1]
+            ifIndex = str(varBinds[0][1])
+            idDescr = str(varBinds[1][1])
+            ifOperStatus = str(varBinds[2][1])
+            ifSpeed = str(varBinds[3][1])
+            ipAdEntAddr = str(str(varBinds[4]).split("= ")[1])
 
             # Create a new interface object
             interface = Interface(ifIndex, idDescr, ifOperStatus, ifSpeed, ipAdEntAddr)
@@ -108,7 +108,8 @@ def main():
 
         sysName = getSysName(ip)
         router = Router(sysName)
-        routers.append(router)
+        if router not in routers:
+            routers.append(router)
 
         # Next, get the OSPF neighbors
         neighbors = getOSPFNeighbors(ip)
@@ -136,13 +137,17 @@ def main():
         RS = RouteSummaries()
         RS.createSummaries(networks, next_hop)
     
+    # Change neighbors IP to sysName for plotting
     for router in routers:
-         # Change neighbors ip to sysName
+        newNeighbors = []
         for neighbor in router.getNeighbors():
             for router2 in routers:
-                if router2.getSysName() == neighbor:
-                    neighbor = router2.getSysName()
+                if (router == router2):
+                    continue
+                if (neighbor in router2.getInterfacesIP()):
+                    newNeighbors.append(router2.getSysName())
                     break
+        router.setNeighbors(newNeighbors)
     
     plotter = TopologyPlotter(routers)
     plotter.plotTopology()
