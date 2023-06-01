@@ -1,5 +1,6 @@
 from pysnmp.hlapi import *
 from tabulate import tabulate
+from TopologyPlotter import TopologyPlotter
 from interface import Interface
 from router import Router
 from easysnmp import Session
@@ -100,12 +101,14 @@ def getInterfaces(ip : str):
 def main():
     networks = []
     next_hop = []
+    routers = []
     for ip in IPsToPoll:
         print("Polling " + ip)
         # First, get the system name
 
         sysName = getSysName(ip)
         router = Router(sysName)
+        routers.append(router)
 
         # Next, get the OSPF neighbors
         neighbors = getOSPFNeighbors(ip)
@@ -132,6 +135,9 @@ def main():
 
         RS = RouteSummaries()
         RS.createSummaries(networks, next_hop)
+    
+    plotter = TopologyPlotter(routers)
+    plotter.plotTopology()
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
 if __name__ == "__main__":
