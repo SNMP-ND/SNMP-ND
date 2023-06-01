@@ -27,7 +27,7 @@ class Router:
     
 
     # Getters
-    def getSysName(self):
+    def getSysName(self) -> str:
         return self.sysName
     
     def getNeighbors(self):
@@ -39,6 +39,8 @@ class Router:
     def getInterfacesIP(self):
         interfacesIP = []
         for interface in self.interfaces:
+            if (interface.getStatus() != "up"):
+                continue
             interfacesIP.append(interface.getIP())
         return interfacesIP
     
