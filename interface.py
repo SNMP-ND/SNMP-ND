@@ -24,7 +24,7 @@ class Interface:
     def getDescription(self):
         return self.description
     
-    def getStatus(self):
+    def getStatus(self) -> str:
         return self.status
     
     def getSpeed(self):
