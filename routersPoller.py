@@ -1,11 +1,11 @@
 from pysnmp.hlapi import *
 from tabulate import tabulate
 from TopologyPlotter import TopologyPlotter
-from interface import Interface
-from router import Router
+from Interface import Interface
+from Router import Router
 from easysnmp import Session
-from routing_tables_poller import RoutingTablesPoller
-from routeSummaries import RouteSummaries
+from RoutingTablesPoller import RoutingTablesPoller
+from RouteSummaries import RouteSummaries
 
 snmpEngine = SnmpEngine()
 routers = []
