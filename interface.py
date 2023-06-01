@@ -30,6 +30,6 @@ class Interface:
     def getSpeed(self):
         return self.speed
     
-    def getIp(self):
+    def getIP(self):
         return self.ip
     
