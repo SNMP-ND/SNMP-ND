@@ -136,6 +136,14 @@ def main():
         RS = RouteSummaries()
         RS.createSummaries(networks, next_hop)
     
+    for router in routers:
+         # Change neighbors ip to sysName
+        for neighbor in router.getNeighbors():
+            for router2 in routers:
+                if router2.getSysName() == neighbor:
+                    neighbor = router2.getSysName()
+                    break
+    
     plotter = TopologyPlotter(routers)
     plotter.plotTopology()
 
