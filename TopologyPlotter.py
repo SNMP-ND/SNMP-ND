@@ -2,7 +2,6 @@ import networkx as nx
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
-import math
 
 class TopologyPlotter:
     routers: list
