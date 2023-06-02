@@ -73,6 +73,7 @@ def getInterfaces(ip : str):
                             ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
                             ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed')),
                             ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntAddr')),
+                            ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntNetMask')),
                             ):
             
             if errorIndication or errorStatus:
@@ -85,9 +86,10 @@ def getInterfaces(ip : str):
             ifOperStatus = str(varBinds[2][1])
             ifSpeed = str(varBinds[3][1])
             ipAdEntAddr = str(str(varBinds[4]).split("= ")[1])
+            ipAdEntNetMask = str(str(varBinds[5]).split("= ")[1])
 
             # Create a new interface object
-            interface = Interface(ifIndex, idDescr, ifOperStatus, ifSpeed, ipAdEntAddr)
+            interface = Interface(ifIndex, idDescr, ifOperStatus, ifSpeed, ipAdEntAddr, ipAdEntNetMask)
 
             # Check for avoiding duplicates or infinite loops
             if ifIndex not in interfacesIndexesRetrieved:
@@ -145,7 +147,7 @@ def main():
                 if (router == router2):
                     continue
                 if (neighbor in router2.getInterfacesIP()):
-                    newNeighbors.append(router2.getSysName())
+                    newNeighbors.append(router2)
                     break
         router.setNeighbors(newNeighbors)
     
