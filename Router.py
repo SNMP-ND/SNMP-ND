@@ -12,6 +12,11 @@ class Router:
     
     def __str__(self):
         return f'Router {self.sysName}: Neighbors: {self.ospfNeighbors}, interfaces: {self.interfaces}'
+    
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Router):
+            return self.sysName == __value.sysName
+        return False
 
     # Setters
     def setNeighbors(self, neighbors : list):
@@ -22,7 +27,7 @@ class Router:
     
 
     # Getters
-    def getSysName(self):
+    def getSysName(self) -> str:
         return self.sysName
     
     def getNeighbors(self):
@@ -30,4 +35,12 @@ class Router:
     
     def getInterfaces(self):
         return self.interfaces
+    
+    def getInterfacesIP(self):
+        interfacesIP = []
+        for interface in self.interfaces:
+            if (interface.getStatus() != "up"):
+                continue
+            interfacesIP.append(interface.getIP())
+        return interfacesIP
     

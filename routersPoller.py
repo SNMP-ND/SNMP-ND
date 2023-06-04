@@ -1,10 +1,11 @@
 from pysnmp.hlapi import *
 from tabulate import tabulate
-from interface import Interface
-from router import Router
+from TopologyPlotter import TopologyPlotter
+from Interface import Interface
+from Router import Router
 from easysnmp import Session
-from routing_tables_poller import RoutingTablesPoller
-from routeSummaries import RouteSummaries
+from RoutingTablesPoller import RoutingTablesPoller
+from RouteSummaries import RouteSummaries
 
 snmpEngine = SnmpEngine()
 routers = []
@@ -28,7 +29,7 @@ def getSysName(ip : str):
     if errorIndication or errorStatus:
         print('SNMP request error:', errorIndication or errorStatus)
 
-    return varBinds[0][1]
+    return str(varBinds[0][1])
 
 def getOSPFNeighbors(ip : str):
     neighbors = []
@@ -72,6 +73,7 @@ def getInterfaces(ip : str):
                             ObjectType(ObjectIdentity('IF-MIB', 'ifOperStatus')),
                             ObjectType(ObjectIdentity('IF-MIB', 'ifSpeed')),
                             ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntAddr')),
+                            ObjectType(ObjectIdentity('IP-MIB', 'ipAdEntNetMask')),
                             ):
             
             if errorIndication or errorStatus:
@@ -79,14 +81,15 @@ def getInterfaces(ip : str):
                 break
 
             # Extract the interface information from the varBinds
-            ifIndex = varBinds[0][1]
-            idDescr = varBinds[1][1]
-            ifOperStatus = varBinds[2][1]
-            ifSpeed = varBinds[3][1]
-            ipAdEntAddr = str(varBinds[4]).split("= ")[1]
+            ifIndex = str(varBinds[0][1])
+            idDescr = str(varBinds[1][1])
+            ifOperStatus = str(varBinds[2][1])
+            ifSpeed = str(varBinds[3][1])
+            ipAdEntAddr = str(str(varBinds[4]).split("= ")[1])
+            ipAdEntNetMask = str(str(varBinds[5]).split("= ")[1])
 
             # Create a new interface object
-            interface = Interface(ifIndex, idDescr, ifOperStatus, ifSpeed, ipAdEntAddr)
+            interface = Interface(ifIndex, idDescr, ifOperStatus, ifSpeed, ipAdEntAddr, ipAdEntNetMask)
 
             # Check for avoiding duplicates or infinite loops
             if ifIndex not in interfacesIndexesRetrieved:
@@ -100,12 +103,15 @@ def getInterfaces(ip : str):
 def main():
     networks = []
     next_hop = []
+    routers = []
     for ip in IPsToPoll:
         print("Polling " + ip)
         # First, get the system name
 
         sysName = getSysName(ip)
         router = Router(sysName)
+        if router not in routers:
+            routers.append(router)
 
         # Next, get the OSPF neighbors
         neighbors = getOSPFNeighbors(ip)
@@ -132,6 +138,21 @@ def main():
 
         RS = RouteSummaries()
         RS.createSummaries(networks, next_hop)
+    
+    # Change neighbors IP to sysName for plotting
+    for router in routers:
+        newNeighbors = []
+        for neighbor in router.getNeighbors():
+            for router2 in routers:
+                if (router == router2):
+                    continue
+                if (neighbor in router2.getInterfacesIP()):
+                    newNeighbors.append(router2)
+                    break
+        router.setNeighbors(newNeighbors)
+    
+    plotter = TopologyPlotter(routers)
+    plotter.plotTopology()
 
 # Call the main function when the script is executed (DEVELOPMENT ONLY)
 if __name__ == "__main__":
