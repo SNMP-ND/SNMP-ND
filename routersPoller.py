@@ -10,7 +10,7 @@ from RouteSummaries import RouteSummaries
 snmpEngine = SnmpEngine()
 routers = []
 
-# DEVELOPMENT ENVIRONMENT VARIABLES
+# Default values for testing
 knownIP = '11.0.0.2'
 community = 'public'
 
@@ -100,7 +100,12 @@ def getInterfaces(ip : str):
     return interfaces
 
 
-def main():
+def main(communityI : str, ip : str):
+    global knownIP
+    global community
+    knownIP = ip
+    community = communityI
+
     networks = []
     next_hop = []
     routers = []
