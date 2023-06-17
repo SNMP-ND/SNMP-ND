@@ -50,4 +50,5 @@ class TopologyPlotter:
             plt.text(x, y, label, horizontalalignment='center', verticalalignment='center', fontsize=8)
 
         plt.axis("off")
+        plt.savefig("topology.pdf", format="pdf", bbox_inches="tight")
         plt.show()
