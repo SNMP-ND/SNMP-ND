@@ -24,12 +24,12 @@ pipenv install && pipenv shell
 cd traps
 # Copy the configuration files
 sudo cp snmptrapd.conf /etc/snmp
-sudo cp snmpd.conf /usr/share/snmp
 
-# Copy the trap handler
+# Copy the trap parser
 sudo mkdir /etc/snmp/scripts
-sudo cp trap_handler.sh /etc/snmp/scripts
-sudo chmod +x /etc/snmp/scripts/trap_handler.sh
+sudo cp trap_parser.sh /etc/snmp/scripts
+sudo chmod +x /etc/snmp/scripts/trap_parser.sh
+
 ```
 
 ### Start the snmpd and snmpdtrapd services
