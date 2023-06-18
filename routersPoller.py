@@ -126,7 +126,7 @@ def main(communityI : str, ip : str):
         interfaces = getInterfaces(ip)
         router.setInterfaces(interfaces)
 
-        # Prints for debugging
+        # Prints for results
         print("Router: " + router.getSysName())
         print("Neighbors: " + str(router.getNeighbors()))
         print("Interfaces:")
