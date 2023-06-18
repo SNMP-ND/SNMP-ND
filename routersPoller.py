@@ -158,7 +158,3 @@ def main(communityI : str, ip : str):
     
     plotter = TopologyPlotter(routers)
     plotter.plotTopology()
-
-# Call the main function when the script is executed (DEVELOPMENT ONLY)
-if __name__ == "__main__":
-    main()
